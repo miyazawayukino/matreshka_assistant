@@ -19,8 +19,8 @@ jobs:
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ github.GITHUB_USERNAME }}
+          password: ${{ github.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: miyazawayukino/matreshka_assistant/matreshka_assistant
           tag_with_ref: true
