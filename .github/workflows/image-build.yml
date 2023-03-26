@@ -20,7 +20,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: 88dtwGb&11175087
+          password: ${{ github.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: miyazawayukino/matreshka_assistant/matreshka_assistant
           tag_with_ref: true
