@@ -8,9 +8,5 @@ from src.utils import Model
 #   "fromAssistant": true
 # }
 class Message(Model):
-  def __init__(self, id: str, message: str, createdAt: str, state: str, fromAssistant: bool):
-    self.id = id
+  def __init__(self, message: str):
     self.message = message
-    self.createdAt = createdAt
-    self.state = state
-    self.fromAssistant = fromAssistant

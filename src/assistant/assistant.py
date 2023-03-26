@@ -135,7 +135,7 @@ class MatreshkaAssistant:
     logger.info(f"Selected {len(chosen_sections)} document sections:")
     logger.info("\n".join(chosen_sections_indexes))
 
-    prompt_header = f"Ответь на вопрос как можно правдивее, используя предоставленный контекст, и если ответ не содержится в приведенном ниже тексте, скажите \"Я не знаю ответ на этот вопрос.\""
+    prompt_header = f"Ответь на вопрос как можно правдивее, используя предоставленный контекст, и если ответ не содержится в приведенном ниже тексте, скажите \"UNKNOWN_TOPIC\""
 
     header = f"""{prompt_header}\n\nContext:\n"""
 
@@ -156,41 +156,33 @@ class MatreshkaAssistant:
     :param bool show_prompt:
     :return str:
     """
+
     prompt = self.construct_prompt(
       query,
       document_embeddings,
       data_frame
     )
-    if show_prompt:
-      logger.info(prompt)
-
-    # response = openai.Completion.create(
-    #   prompt=prompt,
-    #   **self.COMPLETIONS_API_PARAMS
-    # )
-
-    response = openai.ChatCompletion.create(model="gpt-4", messages=[
-
-      {"role": "user", "content": prompt}
-    ])
-
-    answer = response["choices"][0]["text"].strip(" \n")
-
-    if answer == "Я не знаю ответ на этот вопрос.":
-      response = openai.ChatCompletion.create(model="gpt-4", messages=[
-
-        {"role": "user", "content": query}
-      ])
-      answer = response["choices"][0]["text"].strip(" \n")
 
 
-    # if answer == self.type_q:
-    #   response = openai.Completion.create(
-    #     prompt=query,
-    #     **self.COMPLETIONS_API_PARAMS
-    #   )
-    #   answer = response["choices"][0]["text"].strip(" \n")
 
-    logger.info(response)
+    completion = openai.ChatCompletion.create(
+      model="gpt-4",
+      messages=[
+        {"role": "user", "content": prompt}
+      ]
+    )
 
-    return answer
+
+    res = completion.choices[0].message.content
+
+    if res == "UNKNOWN_TOPIC":
+      newCompletion = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+          {"role": "user", "content": query}
+        ]
+      )
+      return newCompletion.choices[0].message.content
+
+    else:
+      return res

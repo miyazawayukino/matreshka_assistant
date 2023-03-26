@@ -19,16 +19,15 @@ class Repository:
     except:
       return Response(status=400, response=Error("Parameter message is required.").__json__(), mimetype="application/json")
 
-
+    try:
+      lastMessages = request.get_json()["lastMessages"]
+      print(lastMessages)
+    except:
+      print("lastMessages not found")
 
     try:
       assistant = self.app.app.config["assistant"]
-
-      userMessage = Message(message["id"], message["message"], message["createdAt"], message["state"], message["fromAssistant"])
-
-      print(userMessage)
-
-      response = ""# Message(assistant.ask(message, assistant.dataset_path, assistant.document_embeddings)).__json__()
+      response = Message(assistant.ask(message, assistant.dataset_path, assistant.document_embeddings)).__json__()
 
       return Response(status=200, response=response, mimetype="application/json")
     except:
