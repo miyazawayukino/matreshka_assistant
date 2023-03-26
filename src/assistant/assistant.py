@@ -25,7 +25,7 @@ class MatreshkaAssistant:
     self.COMPLETIONS_API_PARAMS = {
       "temperature": TEMPERATURE,
       "max_tokens": MAX_TOKENS,
-      "model": COMPLETIONS_MODEL,
+      "model": "gpt-4",
       "frequency_penalty": 0,
       "presence_penalty": 0,
       "top_p": 1
@@ -163,26 +163,26 @@ class MatreshkaAssistant:
       data_frame
     )
 
-
-
     completion = openai.ChatCompletion.create(
-      model="gpt-4",
       messages=[
         {"role": "user", "content": prompt}
-      ]
+      ],
+      **self.COMPLETIONS_API_PARAMS
     )
 
 
     res = completion.choices[0].message.content
 
+
     if res == "UNKNOWN_TOPIC":
       newCompletion = openai.ChatCompletion.create(
-        model="gpt-4",
         messages=[
           {"role": "user", "content": query}
         ]
       )
+      logger.info(newCompletion.choices[0].message.content)
       return newCompletion.choices[0].message.content
 
     else:
+      logger.info(res)
       return res

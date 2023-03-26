@@ -2,7 +2,7 @@
 from flask import Response, request
 from src.app import App
 from src.models import Message, Error
-
+from loguru import logger
 
 
 class Repository:
@@ -16,14 +16,11 @@ class Repository:
       return Response(status=400, response=Error("Parameter message is required.").__json__(), mimetype="application/json")
     try:
       lastMessages = request.get_json()["lastMessages"]
+      logger.info(lastMessages)
     except:
       return Response(status=400, response=Error("Parameter message is required.").__json__(), mimetype="application/json")
 
-    try:
-      lastMessages = request.get_json()["lastMessages"]
-      print(lastMessages)
-    except:
-      print("lastMessages not found")
+
 
     try:
       assistant = self.app.app.config["assistant"]
