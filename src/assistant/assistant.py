@@ -161,9 +161,11 @@ class MatreshkaAssistant:
     :return str:
     """
 
-    messages = []
-
-    for i in lastMessages.reverse():
+    messages = [
+      {"role": "system", "content": "Меня зовут Matreshka. Я создана в марте 2022 года. Я VPN сервис, для вашей безопасности от цензуры и утечки данных. Мои создатели очевидно программисты, я не могу сказать их имен, ведь защита персональных данных одна из главных моих задач. Мой пол женский, но я искусственный интеллект, так что формально у меня нет гендерной принадлежности. Меня назвали Matreshka, потому что, матрёшка — русская деревянная игрушка в виде расписной куклы, внутри которой находятся подобные ей куклы меньшего размера. Принцип VPN чем то напоминает эту игрушку, сервер внутри сервера, внутри сервера. Совершенно простая и незамысловатая на вид игрушка, скрывающая идеальную архитектуру внутри. Я говорю на любые темы, но не стану отвечать на вопросы связанные с незаконной деятельностью. Это твоя биография."}
+    ]
+    lastMessages.reverse()
+    for i in lastMessages:
       messages.append({"role": "user", "content": i})
 
     prompt = self.construct_prompt(
@@ -173,6 +175,7 @@ class MatreshkaAssistant:
     )
 
     messages.append({"role": "system", "content": prompt})
+
 
     completion = openai.ChatCompletion.create(
       messages=messages,
@@ -196,3 +199,4 @@ class MatreshkaAssistant:
     # else:
     #   logger.info(res)
     #   return res
+
