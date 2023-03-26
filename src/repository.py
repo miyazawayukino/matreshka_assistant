@@ -24,7 +24,7 @@ class Repository:
 
     try:
       assistant = self.app.app.config["assistant"]
-      response = Message(assistant.ask(message, assistant.dataset_path, assistant.document_embeddings)).__json__()
+      response = Message(assistant.ask(message, lastMessages, assistant.dataset_path, assistant.document_embeddings)).__json__()
 
       return Response(status=200, response=response, mimetype="application/json")
     except:

@@ -5,6 +5,7 @@ import numpy as np
 import tiktoken
 import openai
 
+
 class MatreshkaAssistant:
   def __init__(
           self,
@@ -135,7 +136,9 @@ class MatreshkaAssistant:
     logger.info(f"Selected {len(chosen_sections)} document sections:")
     logger.info("\n".join(chosen_sections_indexes))
 
-    prompt_header = f"Ответь на вопрос как можно правдивее, используя предоставленный контекст, и если ответ не содержится в приведенном ниже тексте, скажите \"UNKNOWN_TOPIC\""
+    # prompt_header = f"Ответь на вопрос как можно правдивее, используя предоставленный контекст, и если ответ не содержится в приведенном ниже тексте, скажите \"UNKNOWN_TOPIC\""
+
+    prompt_header = f"Ответь на вопрос как можно правдивее, используя предоставленный контекст, и если ответ не содержится в приведенном ниже тексте или в предыдущих ответах и вопросах, то попробуй ответить сама."
 
     header = f"""{prompt_header}\n\nContext:\n"""
 
@@ -145,6 +148,7 @@ class MatreshkaAssistant:
   def ask(
           self,
           query: str,
+          lastMessages: list[str],
           data_frame: pd.DataFrame,
           document_embeddings: dict[(str, str), np.array],
           show_prompt: bool = False
@@ -157,32 +161,38 @@ class MatreshkaAssistant:
     :return str:
     """
 
+    messages = []
+
+    for i in lastMessages.reverse():
+      messages.append({"role": "user", "content": i})
+
     prompt = self.construct_prompt(
       query,
       document_embeddings,
       data_frame
     )
 
+    messages.append({"role": "system", "content": prompt})
+
     completion = openai.ChatCompletion.create(
-      messages=[
-        {"role": "user", "content": prompt}
-      ],
+      messages=messages,
       **self.COMPLETIONS_API_PARAMS
     )
 
 
     res = completion.choices[0].message.content
 
+    return res
 
-    if res == "UNKNOWN_TOPIC":
-      newCompletion = openai.ChatCompletion.create(
-        messages=[
-          {"role": "user", "content": query}
-        ]
-      )
-      logger.info(newCompletion.choices[0].message.content)
-      return newCompletion.choices[0].message.content
-
-    else:
-      logger.info(res)
-      return res
+    # if res == "UNKNOWN_TOPIC":
+    #   newCompletion = openai.ChatCompletion.create(
+    #     messages=[
+    #       {"role": "user", "content": query}
+    #     ]
+    #   )
+    #   logger.info(newCompletion.choices[0].message.content)
+    #   return newCompletion.choices[0].message.content
+    #
+    # else:
+    #   logger.info(res)
+    #   return res
